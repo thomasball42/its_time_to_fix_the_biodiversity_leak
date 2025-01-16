@@ -12,12 +12,12 @@ import matplotlib.pyplot as plt
 
 import _funcs_data
 
-# onedrive_path = "C:\\Users\\Thomas Ball\\OneDrive - University of Cambridge"
-onedrive_path = "E:\\OneDrive\\OneDrive - University of Cambridge"
+onedrive_path = "C:\\Users\\Thomas Ball\\OneDrive - University of Cambridge"
+# onedrive_path = "E:\\OneDrive\\OneDrive - University of Cambridge"
 
 rpath = "D:\\Food_v0\\all_results"  # From NatFood (in revision) 10.33774/coe-2024-fl5fk
 
-datpath = "Work\\Work for others\\Andrew leakage essay\\data\\country_bd_items_weights.csv" # From NatFood (in revision) 10.33774/coe-2024-fl5fk
+datpath = "data\\country_bd_items_weights.csv" # From NatFood (in revision) 10.33774/coe-2024-fl5fk
 
 area_km2 = 1000 #km2 
 
@@ -25,30 +25,26 @@ mix = ["Barley", "Rapeseed", "Wheat"]
 mix_yields = [66893, 37390, 85904] # 100g /ha from FAOSTAT
 mix_yields_kg_km2 = np.array(mix_yields) * 10 # kg/km2
 
-pdat = pd.read_csv(os.path.join(onedrive_path, 
-                                "Work\\Work for others\\Andrew leakage essay\\data",
-                                "Production_Crops_Livestock_E_All_Data_(Normalized).csv"),
+pdat = pd.read_csv(os.path.join("data", "Production_Crops_Livestock_E_All_Data_(Normalized).csv"),
                    encoding = "latin-1") # FAOSTAT all production data
 
 pdat = pdat[pdat.Year==pdat.Year.unique().max()]
 ydat = pdat[pdat.Element.str.contains("Yield")]
 
-if not os.path.isfile(os.path.join(
-    onedrive_path, 
-    "Work\\Work for others\\Andrew leakage essay\\data\\cached_results.csv")) or True:
+if not os.path.isfile(os.path.join("data", "cached_results.csv")) or True:
     
-    df = pd.read_csv(os.path.join(onedrive_path, datpath), index_col = 0)
+    df = pd.read_csv(datpath, index_col = 0)
      
     ukcode = 229
     
-    ukd = pd.read_csv(os.path.join(onedrive_path, "Work\\FOODv0\\results\\gbr\\df_domestic.csv"))
-    uko = pd.read_csv(os.path.join(onedrive_path, "Work\\FOODv0\\results\\gbr\\df_offshore.csv"))
+    ukd = pd.read_csv(os.path.join(rpath, "gbr", "df_domestic.csv"))
+    uko = pd.read_csv(os.path.join(rpath, "gbr", "df_offshore.csv"))
     
     uko.columns = ["Item"] + uko.columns[1:].to_list()
     
     dfmix = uko[uko["Item"].str.contains("|".join(mix), case = False)]
     
-    ukxdf = pd.read_csv(os.path.join(onedrive_path, "Work\\FOODv0\\results\\gbr\\xdf.csv"), index_col = 0)
+    ukxdf = pd.read_csv(os.path.join(rpath, "gbr", "xdf.csv"), index_col = 0)
     
     dfmix.loc[:, "yields_kg_km2"] = mix_yields_kg_km2
     
@@ -84,9 +80,7 @@ if not os.path.isfile(os.path.join(
     comm_of_interest = "Soy"
     
     ccodes = pd.read_csv(
-        os.path.join(
-            onedrive_path, 
-            "Work\\Work for others\\Andrew leakage essay\\data\\country_codes.csv"),
+        os.path.join("data", "country_codes.csv"),
         encoding = "latin-1")
     coi_code = ccodes[ccodes.ISO3==ciso3].FAOSTAT.squeeze()
     coi_exports = pd.DataFrame()
@@ -140,12 +134,10 @@ if not os.path.isfile(os.path.join(
     labels = ["Domestic gain", "Market leakage loss"]
     dat = pd.DataFrame([[uk_benefit, col_benefit], [uk_market_leakage, col_market_leakage]], labels, columns = ["UK", "COL"]).to_csv(
         os.path.join(
-            onedrive_path, 
-            "Work\\Work for others\\Andrew leakage essay\\data\\cached_results.csv"))
+            "data", "cached_results.csv"))
 else:
-    dat = pd.read_csv(os.path.join(
-        onedrive_path, 
-        "Work\\Work for others\\Andrew leakage essay\\data\\cached_results.csv"), index_col = 0)
+    dat = pd.read_csv(os.path.join( 
+        "data", "cached_results.csv"), index_col = 0)
     
 #%% plot
 fig, saxs = plt.subplots(2, 3)
@@ -215,8 +207,6 @@ ax = axs[0]
 ax.set_yticks([])
 
 UK_bd_km2 = df[(df.Item.str.contains("|".join(mix), case=False))&(df.a=="GBR")].bd * dfmix.yields_kg_km2.mean() / 1000000
-# UK_bdT = df[(df.Item.str.contains("|".join(mix), case=False))&(df.a=="GBR")].bd.mean() / 1000
-# UK_bd_km2 = UK_bdT * (dfmix.yields_kg_km2.mean() / 1000)
 ax.boxplot([UK_bd_km2 * 100000], positions = [S], whis = None, conf_intervals=None, vert = False)
 ax.set_title("10$^{-5}$$\\Delta$E/km$^2$", size = 10)
 ukml_km2 = ldf.groupby("Producer_Country_Code").bd_opp_cost_m2.mean().dropna() * 1000000
