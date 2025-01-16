@@ -17,7 +17,8 @@ onedrive_path = "C:\\Users\\Thomas Ball\\OneDrive - University of Cambridge"
 
 rpath = "D:\\Food_v0\\all_results"  # From NatFood (in revision) 10.33774/coe-2024-fl5fk
 
-datpath = "data\\country_bd_items_weights.csv" # From NatFood (in revision) 10.33774/coe-2024-fl5fk
+datpath = "data\\country_bd_items_weights.csv" # From NatFood (in revision) 
+# 10.33774/coe-2024-fl5fk output of "global_commodity_impacts.py" and "plot_global_commodity_impacts.py"
 
 area_km2 = 1000 #km2 
 
